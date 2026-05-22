@@ -1,5 +1,12 @@
 app_name = "orman_trading"
-app_title = "orman trading"
+
+fixtures = [
+	{
+		"dt": "Custom Field",
+		"filters": [["name", "in", ["Work Order-custom_stock_reserved_qty"]]],
+	}
+]
+app_title = "Orman Trading"
 app_publisher = "Sowaan Pvt. Ltd"
 app_description = "Orman Trading"
 app_email = "info@sowaan.com"
@@ -44,6 +51,9 @@ app_license = "mit"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {
+	"Work Order": "public/js/work_order.js",
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -144,6 +154,11 @@ app_license = "mit"
 # 		"on_trash": "method"
 # 	}
 # }
+doc_events = {
+	"Work Order": {
+		"before_save": "orman_trading.orman_trading.work_order.work_order.update_work_order_reserved_qty",
+	}
+}
 
 # Scheduled Tasks
 # ---------------

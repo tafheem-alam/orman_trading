@@ -1,0 +1,14 @@
+[
+  {
+    "doctype": "Custom Field",
+    "name": "Work Order-custom_stock_reserved_qty",
+    "dt": "Work Order",
+    "fieldname": "custom_stock_reserved_qty",
+    "fieldtype": "Float",
+    "label": "Stock Reserved Qty",
+    "insert_after": "item_name",
+    "read_only": 1,
+    "no_copy": 1,
+    "print_hide": 0
+  }
+]
