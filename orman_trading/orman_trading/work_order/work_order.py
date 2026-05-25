@@ -74,20 +74,28 @@ def get_reserved_qty_for_work_order(sales_order, production_item, sales_order_it
 @frappe.whitelist()
 def get_so_items_for_item(sales_order, production_item, current_work_order=None):
 	"""
-	Return SO Item rows not yet precisely linked to another Work Order.
-	Only rows whose exact name is stored on another WO's sales_order_item are excluded.
-	Old WOs (sales_order_item = NULL) are not filtered out here — the before_save hook
-	progressively sets sales_order_item so this filter improves over time.
+	Return SO Item rows not yet precisely linked to another Work Order, enriched with
+	the location from the Technical Sheet child table (matched by position within item_code).
 	"""
 	all_rows = frappe.get_all(
 		"Sales Order Item",
 		filters={"parent": sales_order, "item_code": production_item},
-		fields=["name", "idx", "qty", "stock_reserved_qty", "reserve_stock", "custom_location", "delivery_date"],
+		fields=["name", "idx", "qty", "stock_reserved_qty", "reserve_stock"],
 		order_by="idx asc",
 	)
 
 	if not all_rows:
 		return []
+
+	# Attach location from Technical Sheet by positional match within item_code
+	ts_rows = frappe.get_all(
+		"Technical Sheet",
+		filters={"parent": sales_order, "parentfield": "custom_table_2", "item_code": production_item},
+		fields=["location", "idx"],
+		order_by="idx asc",
+	)
+	for i, row in enumerate(all_rows):
+		row["location"] = ts_rows[i].location if i < len(ts_rows) else None
 
 	row_names = [r.name for r in all_rows]
 
@@ -102,7 +110,7 @@ def get_so_items_for_item(sales_order, production_item, current_work_order=None)
 	already_linked = frappe.get_all("Work Order", filters=wo_filters, fields=["sales_order_item"])
 	linked_row_names = {wo.sales_order_item for wo in already_linked}
 
-	_logger().info(f"[ReservedQty] all rows: {row_names} | precisely linked: {linked_row_names}")
+	_logger().info(f"[ReservedQty] all rows: {row_names} | linked: {linked_row_names}")
 	return [r for r in all_rows if r.name not in linked_row_names]
 
 

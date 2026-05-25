@@ -98,7 +98,7 @@ function link_so_item(frm, row) {
 /** Show a dialog when multiple rows with the same qty exist. */
 function prompt_so_item_selection(frm, rows) {
 	const options = rows.map((row) => {
-		const location = row.custom_location || '—';
+		const location = row.location || '—';
 		const parts = [
 			`Row ${row.idx}`,
 			`Qty: ${row.qty}`,
